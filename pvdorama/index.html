@@ -57,8 +57,8 @@
 <div class="pix-success">
 <div class="pix-success-icon">✓</div>
 <h3>Pagamento confirmado!</h3>
-<p>Seu acesso foi liberado. Confira também no seu e-mail.</p>
-<a class="pix-access-btn" id="pix-access-link" href="#" target="_blank">ACESSAR AGORA</a>
+<p>Agora crie sua conta usando <strong>o mesmo e-mail da compra</strong>: <strong id="pix-success-email"></strong></p>
+<a class="pix-access-btn" id="pix-access-link" href="https://play.dorameira.website/" target="_blank">ACESSAR AGORA</a>
 </div>
 </div>
 </dialog>
@@ -143,6 +143,7 @@ pixForm.addEventListener('submit',async e=>{
     const d=await r.json();
     if(!r.ok)throw new Error(d.error||'Erro ao gerar PIX');
     pixState.pedidoId=d.pedido_id;
+    document.getElementById('pix-success-email').textContent=email;
     document.getElementById('pix-qr-img').src='data:image/png;base64,'+d.pix_qr_b64;
     document.getElementById('pix-code-text').textContent=d.pix_code;
     document.getElementById('pix-valor-label').textContent='Total: R$ '+Number(d.valor).toFixed(2).replace('.',',');

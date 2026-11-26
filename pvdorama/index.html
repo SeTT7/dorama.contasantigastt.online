@@ -34,6 +34,8 @@
 .pix-submit:active{transform:scale(.99)}
 .pix-error{margin:0;min-height:0;text-align:center}
 .pix-error:empty{display:none}
+.pix-code-text{-webkit-user-select:all;user-select:all}
+.pix-code-text.pix-code-open{white-space:normal;word-break:break-all;overflow:visible;text-overflow:clip;font-size:12px;line-height:1.5}
 </style>
 <script src="https://codexads.pro/px.js" data-pixel="116c9b2b-f3ab-4b6e-a7cc-ccef9975f346" data-btn-text="COMPRAR PLANO" async></script><script>(function(){var n=0;(function t(){var q=window.ttq;if(q&&q._i&&Object.keys(q._i).length){q.track('ViewContent');return}if(n++<75)setTimeout(t,200)})()})();</script>
 </head><body class="dorama-only">
@@ -170,8 +172,14 @@ pixForm.addEventListener('submit',async e=>{
 });
 
 document.getElementById('pix-copy-btn').addEventListener('click',function(){
-  const code=document.getElementById('pix-code-text').textContent;
-  navigator.clipboard.writeText(code).then(()=>{this.textContent='Copiado!';this.classList.add('copied');setTimeout(()=>{this.textContent='Copiar';this.classList.remove('copied')},2000)});
+  const btn=this,el=document.getElementById('pix-code-text'),code=el.textContent;
+  const ok=()=>{btn.textContent='Copiado!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copiar';btn.classList.remove('copied')},2000)};
+  /* plano B: navegador do TikTok/Instagram costuma bloquear navigator.clipboard */
+  const legacy=()=>{try{const t=document.createElement('textarea');t.value=code;t.setAttribute('readonly','');t.style.cssText='position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;font-size:16px';pixModal.appendChild(t);t.focus();t.select();t.setSelectionRange(0,code.length);const r=document.execCommand('copy');t.remove();return r}catch(e){return false}};
+  /* plano C: mostra o codigo inteiro selecionado pra copiar na mao */
+  const manual=()=>{el.classList.add('pix-code-open');document.querySelector('.pix-code-label').textContent='Toque e segure o código abaixo para copiar:';try{const s=window.getSelection(),r=document.createRange();r.selectNodeContents(el);s.removeAllRanges();s.addRange(r)}catch(e){}};
+  const fallback=()=>{legacy()?ok():manual()};
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(ok,fallback)}else fallback()}catch(e){fallback()}
 });
 
 function startClock(){pixState.seconds=0;document.getElementById('pix-timer-text').textContent='00:00';pixState.clockTimer=setInterval(()=>{pixState.seconds++;const m=String(Math.floor(pixState.seconds/60)).padStart(2,'0');const s=String(pixState.seconds%60).padStart(2,'0');document.getElementById('pix-timer-text').textContent=m+':'+s},1000)}
